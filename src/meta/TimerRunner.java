@@ -13,7 +13,7 @@ public class TimerRunner {
         String outputFile = "timing-output.txt";
         try (FileWriter writer = new FileWriter(outputFile)) {
             Double totalTime = 0.0;
-            for (int day = 1; day <= 25; day++) {
+            for (int day = 1; day <= 12; day++) {
                 String zeroFilledDay = (day < 10 ? "0" : "") + day;
                 for (int part = 1; part <= 2; part++) {
                     File inputFile = new File("./data/day" + zeroFilledDay + ".txt");
