@@ -1,0 +1,15 @@
+.idea/
+data/
+/out/*
+!out/production
+/out/production/*
+!out/production/advent-of-code-2025
+/out/production/advent-of-code-2025/*
+!out/production/advent-of-code-2025/src
+
+/src/meta/MasterSolver.java
+
+# for https://github.com/LiquidFun/aoc_tiles
+.aoc_tiles/*
+!.aoc_tiles/tiles/
+session.cookie
