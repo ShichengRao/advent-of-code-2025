@@ -3,19 +3,24 @@ package src.solutions;
 import src.meta.DayTemplate;
 import src.objects.Coordinate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Day09 extends DayTemplate {
 
     public String solve(boolean part1, Scanner in) {
         long answer = 0;
         List<Coordinate> coords = new ArrayList<>();
+        List<Integer> xs = new ArrayList<>();
+        List<Integer> ys = new ArrayList<>();
         while (in.hasNextLine()) {
             String[] line = in.nextLine().split(",");
-            coords.add(new Coordinate(Integer.parseInt(line[0]), Integer.parseInt(line[1])));
+            xs.add(Integer.parseInt(line[0]));
+            ys.add(Integer.parseInt(line[1]));
+            coords.add(new Coordinate(xs.getLast(), ys.getLast()));
         }
+        Collections.sort(xs);
+        Collections.sort(ys);
+
         for (int i = 0; i < coords.size(); i++) {
             for (int k = i + 1; k < coords.size(); k++) {
                 Coordinate first = coords.get(i);
@@ -25,31 +30,44 @@ public class Day09 extends DayTemplate {
                     if (part1) {
                         answer = size;
                     } else {
-                        //check the four edges
-                        boolean firstTwoEdges = true;
-                        for (int j = Math.min(first.x, second.x); j <= Math.max(first.x, second.x); j++) {
-                            if (!inLoop(j, first.y, coords) || !inLoop(j, second.y, coords)) {
-                                firstTwoEdges = false;
-                                break;
-                            }
-                        }
-                        if (firstTwoEdges) {
-                            boolean finalTwoEdges = true;
-                            for (int j = Math.min(first.y, second.y); j <= Math.max(first.y, second.y); j++) {
-                                if (!inLoop(first.x, j, coords) || !inLoop(second.x, j, coords)) {
-                                    finalTwoEdges = false;
+                        boolean allEdgesIn = true;
+
+                        int minX = Math.min(first.x, second.x);
+                        int maxX = Math.max(first.x, second.x);
+
+                        // Check only x-coordinates that exist in the range
+                        for (int x : xs) {
+                            if (x >= minX && x <= maxX) {
+                                if (!inLoop(x, first.y, coords) || !inLoop(x, second.y, coords)) {
+                                    allEdgesIn = false;
                                     break;
                                 }
                             }
-                            if (finalTwoEdges) {
-                                answer = size;
+                        }
+
+                        if (allEdgesIn) {
+                            int minY = Math.min(first.y, second.y);
+                            int maxY = Math.max(first.y, second.y);
+
+                            for (int y : ys) {
+                                if (y >= minY && y <= maxY) {
+                                    if (!inLoop(first.x, y, coords) || !inLoop(second.x, y, coords)) {
+                                        allEdgesIn = false;
+                                        break;
+                                    }
+                                }
                             }
+                        }
+
+                        if (allEdgesIn) {
+                            answer = size;
                         }
                     }
                 }
             }
         }
         return answer + "";
+
     }
 
     private boolean inLoop(int x, int y, List<Coordinate> loop) {
