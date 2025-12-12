@@ -37,7 +37,7 @@ public class Day12 extends DayTemplate {
             for(int i = 1; i < nums.length; i++){
                 int num = Integer.parseInt(nums[i]);
                 naiveUpper += num;
-                naiveLower += num * hardcode.get(i - 1);
+                naiveLower += num * shapes.get(i - 1);
             }
             if(naiveUpper <= length/3 * width/3){
                 possible++;
