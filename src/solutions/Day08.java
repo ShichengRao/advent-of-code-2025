@@ -7,45 +7,68 @@ import java.util.*;
 public class Day08 extends DayTemplate {
 
     public String solve(boolean part1, Scanner in) {
+        List<Box> boxes = readBoxes(in);
+        UnionFind uf = new UnionFind(boxes.size());
+        List<Edge> edges = buildEdges(boxes);
+
+        Long earlyAnswer = applyEdges(part1, boxes, uf, edges);
+        if (earlyAnswer != null) {
+            return earlyAnswer + "";
+        }
+
+        return largestComponentProduct(boxes, uf) + "";
+    }
+
+    private List<Box> readBoxes(Scanner in) {
         List<Box> boxes = new ArrayList<>();
         while (in.hasNextLine()) {
             String[] line = in.nextLine().split(",");
             boxes.add(new Box(Integer.parseInt(line[0]), Integer.parseInt(line[1]), Integer.parseInt(line[2])));
         }
+        return boxes;
+    }
 
-        UnionFind uf = new UnionFind(boxes.size());
-
+    private List<Edge> buildEdges(List<Box> boxes) {
         List<Edge> edges = new ArrayList<>();
-        for(int i = 0; i < boxes.size(); i++){
-            for(int j = i + 1; j < boxes.size(); j++){
+        for (int i = 0; i < boxes.size(); i++) {
+            for (int j = i + 1; j < boxes.size(); j++) {
                 Box box1 = boxes.get(i);
                 Box box2 = boxes.get(j);
-                long dist = ((long)(box1.x - box2.x) * (box1.x - box2.x))
-                        + ((long)(box1.y - box2.y) * (box1.y - box2.y))
-                        + ((long)(box1.z - box2.z) * (box1.z - box2.z));
-                edges.add(new Edge(i, j, dist));
+                edges.add(new Edge(i, j, squaredDistance(box1, box2)));
             }
         }
         Collections.sort(edges);
+        return edges;
+    }
 
+    private long squaredDistance(Box box1, Box box2) {
+        return ((long) (box1.x - box2.x) * (box1.x - box2.x))
+                + ((long) (box1.y - box2.y) * (box1.y - box2.y))
+                + ((long) (box1.z - box2.z) * (box1.z - box2.z));
+    }
+
+    private Long applyEdges(boolean part1, List<Box> boxes, UnionFind uf, List<Edge> edges) {
         int applies = 0;
         int maxTries = part1 ? 1000 : 1000000;
 
-        for(Edge edge : edges){
-            if(uf.union(edge.a, edge.b)){
+        for (Edge edge : edges) {
+            if (uf.union(edge.a, edge.b)) {
                 applies++;
-                if(applies == 999 && !part1){
-                    return ((long)boxes.get(edge.a).x * boxes.get(edge.b).x) + "";
+                if (applies == 999 && !part1) {
+                    return (long) boxes.get(edge.a).x * boxes.get(edge.b).x;
                 }
             }
             maxTries--;
-            if(maxTries < 0){
+            if (maxTries < 0) {
                 break;
             }
         }
+        return null;
+    }
 
+    private int largestComponentProduct(List<Box> boxes, UnionFind uf) {
         Map<Integer, Integer> cycles = new HashMap<>();
-        for(int i = 0; i < boxes.size(); i++){
+        for (int i = 0; i < boxes.size(); i++) {
             int root = uf.find(i);
             cycles.put(root, cycles.getOrDefault(root, 0) + 1);
         }
@@ -53,7 +76,7 @@ public class Day08 extends DayTemplate {
         List<Integer> c = new ArrayList<>(cycles.values());
         c.sort(Collections.reverseOrder());
 
-        return (c.get(0) * c.get(1) * c.get(2)) + "";
+        return c.get(0) * c.get(1) * c.get(2);
     }
 }
 
