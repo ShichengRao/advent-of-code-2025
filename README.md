@@ -8,3 +8,13 @@
   2025 - 0 ⭐ - Java
 </h1>
 <!-- AOC TILES END -->
+
+## Local verification
+
+Compile all solutions without writing generated classes into the repo:
+
+```sh
+mkdir -p /tmp/advent-of-code-2025-classes
+javac -d /tmp/advent-of-code-2025-classes $(find src -name '*.java')
+java -cp /tmp/advent-of-code-2025-classes src.meta.TimerRunner
+```
