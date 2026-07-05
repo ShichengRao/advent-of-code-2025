@@ -8,6 +8,11 @@ import java.util.Scanner;
 import java.util.function.Function;
 
 public class Utils {
+    private static final int[] CARDINAL_XS = new int[]{1, -1, 0, 0};
+    private static final int[] CARDINAL_YS = new int[]{0, 0, 1, -1};
+    private static final int[] FULL_XS = new int[]{1, 1, 1, 0, 0, -1, -1, -1};
+    private static final int[] FULL_YS = new int[]{1, 0, -1, 1, -1, 1, 0, -1};
+
     public static long gcd(long a, long b) {
         if (b == 0) return a;
         return gcd(b, a % b);
@@ -44,7 +49,7 @@ public class Utils {
         return result;
     }
 
-    public static int lcm(int[] nums){
+    public static int lcm(int[] nums) {
         int result = nums[0];
         for (int i = 1; i < nums.length; i++) {
             result = lcm(result, nums[i]);
@@ -60,7 +65,7 @@ public class Utils {
         return result;
     }
 
-    public static long lcm(long[] nums){
+    public static long lcm(long[] nums) {
         long result = nums[0];
         for (int i = 1; i < nums.length; i++) {
             result = lcm(result, nums[i]);
@@ -68,33 +73,25 @@ public class Utils {
         return result;
     }
 
-    public static boolean safe(int x, int y, int[][] grid){
+    public static boolean safe(int x, int y, int[][] grid) {
         return x >= 0 && x < grid.length && y >= 0 && y < grid[0].length;
     }
 
-    public static boolean safe(int x, int y, char[][] grid){
+    public static boolean safe(int x, int y, char[][] grid) {
         return x >= 0 && x < grid.length && y >= 0 && y < grid[0].length;
     }
 
-    public static List<Coordinate> getNeighbors(int x, int y, int[][] grid){
-        List<Coordinate> neighbors = new ArrayList<>();
-        int[] xs = new int[]{1,-1,0,0};
-        int[] ys = new int[]{0,0,1,-1};
-        for (int i = 0; i < 4; i++) {
-            int nx = x + xs[i];
-            int ny = y + ys[i];
-            if (safe(nx, ny, grid)) {
-                neighbors.add(new Coordinate(nx, ny));
-            }
-        }
-        return neighbors;
+    public static List<Coordinate> getNeighbors(int x, int y, int[][] grid) {
+        return collectNeighbors(x, y, grid, CARDINAL_XS, CARDINAL_YS, CARDINAL_XS.length);
     }
 
-    public static List<Coordinate> getNeighborsFull(int x, int y, int[][] grid){
+    public static List<Coordinate> getNeighborsFull(int x, int y, int[][] grid) {
+        return collectNeighbors(x, y, grid, FULL_XS, FULL_YS, 4);
+    }
+
+    private static List<Coordinate> collectNeighbors(int x, int y, int[][] grid, int[] xs, int[] ys, int limit) {
         List<Coordinate> neighbors = new ArrayList<>();
-        int[] xs = new int[]{1,1,1,0,0,-1,-1,-1};
-        int[] ys = new int[]{1,0,-1,1,-1,1,0,-1};
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < limit; i++) {
             int nx = x + xs[i];
             int ny = y + ys[i];
             if (safe(nx, ny, grid)) {
@@ -113,10 +110,7 @@ public class Utils {
         }
         return result;
     }
-
-
-
-    public static int[][] buildGrid(List<String> lines, Function<Character, Integer> converter){
+    public static int[][] buildGrid(List<String> lines, Function<Character, Integer> converter) {
         int[][] grid = new int[lines.get(0).length()][lines.size()];
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
@@ -127,7 +121,7 @@ public class Utils {
         return grid;
     }
 
-    public static char[][] buildGrid(List<String> lines){
+    public static char[][] buildGrid(List<String> lines) {
         char[][] grid = new char[lines.get(0).length()][lines.size()];
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
@@ -138,7 +132,7 @@ public class Utils {
         return grid;
     }
 
-    public static char[][] getGrid(Scanner in){
+    public static char[][] getGrid(Scanner in) {
         List<String> lines = new ArrayList<>();
         while (in.hasNext()) {
             lines.add(in.nextLine());
@@ -146,7 +140,7 @@ public class Utils {
         return buildGrid(lines);
     }
 
-    public static long det(long x1, long x2, long y1, long y2){
+    public static long det(long x1, long x2, long y1, long y2) {
         return x1 * y2 - x2 * y1;
     }
 

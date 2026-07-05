@@ -70,46 +70,58 @@ public class Day02 extends DayTemplate {
         String[] lines = in.nextLine().split(",");
 
         for (String line : lines) {
-            String[] parts = line.split("-");
-            BigInteger low = new BigInteger(parts[0]);
-            BigInteger high = new BigInteger(parts[1]);
-
-            int lowLen = parts[0].length();
-            int highLen = parts[1].length();
-
-            // Process each length separately
-            for (int len = lowLen; len <= highLen; len++) {
-                // 10^(len-1) is the smallest len-digit number
-                BigInteger rangeStart = low.max(BigInteger.TEN.pow(len - 1));
-                // 10^len - 1 is the largest len-digit number
-                BigInteger rangeEnd = high.min(BigInteger.TEN.pow(len).subtract(BigInteger.ONE));
-
-                if (rangeStart.compareTo(rangeEnd) > 0) continue;
-
-                if (part1) {
-                    if (len % 2 == 1) continue;
-                    BigInteger divisor = getPart1Divisor(len);
-                    answer = answer.add(sumArithmeticSequence(rangeStart, rangeEnd, divisor));
-                } else {
-                    Set<BigInteger> primeDivisors = getPart2PrimeDivisors(len);
-
-                    if (primeDivisors.size() == 1) {
-                        answer = answer.add(sumArithmeticSequence(rangeStart, rangeEnd,
-                                primeDivisors.iterator().next()));
-                    } else if(primeDivisors.size() == 2) {
-                        BigInteger[] divArray = primeDivisors.toArray(new BigInteger[2]);
-                        BigInteger d1 = divArray[0];
-                        BigInteger d2 = divArray[1];
-                        BigInteger lcmDiv = lcm(d1, d2);
-
-                        answer = answer.add(sumArithmeticSequence(rangeStart, rangeEnd, d1));
-                        answer = answer.add(sumArithmeticSequence(rangeStart, rangeEnd, d2));
-                        answer = answer.subtract(sumArithmeticSequence(rangeStart, rangeEnd, lcmDiv));
-                    }
-                }
+            NumberRange range = parseRange(line);
+            for (int len = range.lowLength; len <= range.highLength; len++) {
+                answer = answer.add(sumForLength(part1, range, len));
             }
         }
         return answer.toString();
+    }
+
+    private NumberRange parseRange(String line) {
+        String[] parts = line.split("-");
+        return new NumberRange(new BigInteger(parts[0]), new BigInteger(parts[1]),
+                parts[0].length(), parts[1].length());
+    }
+
+    private BigInteger sumForLength(boolean part1, NumberRange range, int len) {
+        BigInteger rangeStart = range.low.max(BigInteger.TEN.pow(len - 1));
+        BigInteger rangeEnd = range.high.min(BigInteger.TEN.pow(len).subtract(BigInteger.ONE));
+
+        if (rangeStart.compareTo(rangeEnd) > 0) {
+            return BigInteger.ZERO;
+        }
+
+        if (part1) {
+            return sumPart1Repeats(rangeStart, rangeEnd, len);
+        }
+        return sumPart2Repeats(rangeStart, rangeEnd, len);
+    }
+
+    private BigInteger sumPart1Repeats(BigInteger rangeStart, BigInteger rangeEnd, int len) {
+        if (len % 2 == 1) {
+            return BigInteger.ZERO;
+        }
+        return sumArithmeticSequence(rangeStart, rangeEnd, getPart1Divisor(len));
+    }
+
+    private BigInteger sumPart2Repeats(BigInteger rangeStart, BigInteger rangeEnd, int len) {
+        Set<BigInteger> primeDivisors = getPart2PrimeDivisors(len);
+
+        if (primeDivisors.size() == 1) {
+            return sumArithmeticSequence(rangeStart, rangeEnd, primeDivisors.iterator().next());
+        }
+        if (primeDivisors.size() == 2) {
+            BigInteger[] divArray = primeDivisors.toArray(new BigInteger[2]);
+            BigInteger d1 = divArray[0];
+            BigInteger d2 = divArray[1];
+            BigInteger lcmDiv = lcm(d1, d2);
+
+            return sumArithmeticSequence(rangeStart, rangeEnd, d1)
+                    .add(sumArithmeticSequence(rangeStart, rangeEnd, d2))
+                    .subtract(sumArithmeticSequence(rangeStart, rangeEnd, lcmDiv));
+        }
+        return BigInteger.ZERO;
     }
 
     // Arithmetic sequence sum with BigInteger
@@ -127,5 +139,19 @@ public class Day02 extends DayTemplate {
 
         // sum = (firstTerm + lastTerm) * count / 2
         return firstTerm.add(lastTerm).multiply(count).divide(BigInteger.TWO);
+    }
+
+    private static class NumberRange {
+        BigInteger low;
+        BigInteger high;
+        int lowLength;
+        int highLength;
+
+        NumberRange(BigInteger low, BigInteger high, int lowLength, int highLength) {
+            this.low = low;
+            this.high = high;
+            this.lowLength = lowLength;
+            this.highLength = highLength;
+        }
     }
 }

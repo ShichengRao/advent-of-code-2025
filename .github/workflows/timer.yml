@@ -19,9 +19,14 @@ jobs:
           java-version: 21
           distribution: 'corretto'
 
-      - name: Build and run solutions
+      - name: Compile solutions
         run: |
-          java -cp out/production/advent-of-code-2025 src.meta.TimerRunner
+          mkdir -p build/classes
+          javac -d build/classes $(find src -name '*.java')
+
+      - name: Run solutions
+        run: |
+          java -cp build/classes src.meta.TimerRunner
 
       - name: Compare timing
         id: compare-timing

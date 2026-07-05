@@ -10,42 +10,58 @@ import java.util.Scanner;
 public class Day05 extends DayTemplate {
 
     public String solve(boolean part1, Scanner in) {
-        long answer = 0;
+        List<IDRange> ranges = readRanges(in);
+        Collections.sort(ranges);
+
+        long answer;
+        if (part1) {
+            answer = countBlockedIds(in, ranges);
+        } else {
+            answer = countMergedRangeSize(ranges);
+        }
+        return answer + "";
+    }
+
+    private List<IDRange> readRanges(Scanner in) {
         List<IDRange> ranges = new ArrayList<>();
         while (in.hasNextLine()) {
             String l = in.nextLine();
-            if(l.isEmpty()){
+            if (l.isEmpty()) {
                 break;
             }
             String[] line = l.split("-");
             ranges.add(new IDRange(Long.parseLong(line[0]), Long.parseLong(line[1])));
         }
-        Collections.sort(ranges);
-        if(!part1){
-            IDRange currRange = ranges.getFirst();
-            for(IDRange r: ranges){
-                if(r.low > currRange.high){
-                    answer += currRange.high - currRange.low + 1;
-                    currRange = r;
-                }
-                else{
-                    currRange.high = Math.max(currRange.high, r.high);
-                }
-            }
-            answer += currRange.high - currRange.low + 1;
-        }
-        else{
-            while (in.hasNextLine()) {
-                long line = Long.parseLong(in.nextLine());
-                for(IDRange range: ranges){
-                    if(range.contains(line)){
-                        answer++;
-                        break;
-                    }
+        return ranges;
+    }
+
+    private long countBlockedIds(Scanner in, List<IDRange> ranges) {
+        long answer = 0;
+        while (in.hasNextLine()) {
+            long line = Long.parseLong(in.nextLine());
+            for (IDRange range : ranges) {
+                if (range.contains(line)) {
+                    answer++;
+                    break;
                 }
             }
         }
-        return answer+ "";
+        return answer;
+    }
+
+    private long countMergedRangeSize(List<IDRange> ranges) {
+        long answer = 0;
+        IDRange currRange = ranges.getFirst();
+        for (IDRange range : ranges) {
+            if (range.low > currRange.high) {
+                answer += currRange.high - currRange.low + 1;
+                currRange = range;
+            } else {
+                currRange.high = Math.max(currRange.high, range.high);
+            }
+        }
+        answer += currRange.high - currRange.low + 1;
+        return answer;
     }
 }
 

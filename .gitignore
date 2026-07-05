@@ -1,15 +1,26 @@
+# IntelliJ / local editor state
 .idea/
+.vscode/
+*.iml
+
+# Local Advent of Code inputs and auth
 data/
-/out/*
-!out/production
-/out/production/*
-!out/production/advent-of-code-2025
-/out/production/advent-of-code-2025/*
-!out/production/advent-of-code-2025/src
+session.cookie
+
+# Java build outputs
+*.class
+out/
+build/
+target/
+bin/
+.gradle/
+
+# Generated local reports
+timing-output.txt
+*.log
 
 /src/meta/MasterSolver.java
 
 # for https://github.com/LiquidFun/aoc_tiles
 .aoc_tiles/*
 !.aoc_tiles/tiles/
-session.cookie
